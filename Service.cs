@@ -21,7 +21,10 @@ namespace BitventureAssessment
         [JsonProperty("endpoints")]
         public Endpoint[] Endpoints { get; set; }
 
-        
+        [JsonProperty("identifiers")]
+        public Identifier[] Identifiers { get; set; }
+
+
         //
         // Summary:
         //     Returns BaseUrl that ends with a '/' for the http client 

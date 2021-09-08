@@ -19,7 +19,7 @@ namespace BitventureAssessment
         static void Main(string[] args)
         {
             JsonProcessor jsonProcessor = new JsonProcessor();
-            jsonProcessor.Process(@"C:\Users\DELL\Downloads\basic_endpoints.json");
+            jsonProcessor.Process(@"C:\Users\DELL\Downloads\bonus_endpoints.json");
             Console.ReadLine();
         }
 

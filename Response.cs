@@ -22,7 +22,7 @@ namespace BitventureAssessment
         [JsonProperty("identifier", NullValueHandling = NullValueHandling.Ignore)]
         public string Identifier { get; set; }
 
-        public static void ComapareResults(Endpoint endpoint, HttpResponseMessage httpResponse)
+        public static void ComapareResults(Identifier[] identifiers, Endpoint endpoint, HttpResponseMessage httpResponse)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace BitventureAssessment
                         }
                         else
                         {
-                            IdentifierMatcher(valueElement, endpointResult.Identifier);
+                            IdentifierMatcher(identifiers,valueElement, endpointResult.Identifier);
                         }
                     }
                     else
@@ -60,19 +60,36 @@ namespace BitventureAssessment
             }
         }
 
-        private static void IdentifierMatcher( string element, string identifier)
+        private static void IdentifierMatcher(Identifier[] identifiers, string element, string identifierChecker)
         {
-            Regex reg = new Regex(identifier);
+            Regex reg = new Regex(identifierChecker);
 
             try
             {
                 if (reg.IsMatch(element))
                 {
-                    Console.WriteLine("{0} from HttpResponce JSON Match Identifier {1} from JSON file", element, identifier);
+                    Console.WriteLine("{0} from HttpResponce JSON Match Identifier {1} from JSON file", element, identifierChecker);
                 }
                 else
                 {
-                    Console.WriteLine("{0} from HttpResponce JSON  Miss Match Identifier {1} from JSON file", element, identifier);
+                    // Bonus Code
+
+                    if (identifiers.Length > 0)
+                    { 
+                        foreach (Identifier identifier in identifiers)
+                        {
+                            if(identifier.Key.CompareTo(identifierChecker) == 0)
+                            {
+                                Console.WriteLine("{0} from HttpResponce JSON Match Identifier {1} from JSON file", element, identifier.Value);
+                            }
+                        }
+                    }
+                    else 
+                    {
+                        Console.WriteLine("{0} from HttpResponce JSON  Miss Match Identifier {1} from JSON file", element, identifierChecker);
+
+                    }
+
                 }
             }
             catch (Exception ex)

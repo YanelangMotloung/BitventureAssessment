@@ -4,7 +4,6 @@ using System;
 
 
 
-
 namespace BitventureAssessment
 {
     public partial class Endpoint
@@ -20,6 +19,9 @@ namespace BitventureAssessment
 
         [JsonProperty("response")]
         public Response[] Response { get; set; }
+
+        [JsonProperty("requestBody")]
+        public string RequestBody { get; set; }
 
 
         //

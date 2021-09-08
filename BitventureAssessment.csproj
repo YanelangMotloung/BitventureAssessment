@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Endpoint.cs" />
     <Compile Include="DataProcessor.cs" />
+    <Compile Include="Identifier.cs" />
     <Compile Include="JsonData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

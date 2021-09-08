@@ -121,7 +121,7 @@ namespace BitventureAssessment
                                 if (httpResponse.IsSuccessStatusCode)
                                 {
                                     //Compare Results
-                                    Response.ComapareResults(endpoint,httpResponse);
+                                    Response.ComapareResults(service.Identifiers, endpoint ,httpResponse);
                                 }
                                 else
                                 {
