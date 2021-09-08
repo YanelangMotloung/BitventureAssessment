@@ -102,6 +102,7 @@ namespace BitventureAssessment
             {
                 if (service.Enabled)
                 {
+
                     using (var client = new HttpClient())
                     {
                         // Set the client Base address.
@@ -110,8 +111,10 @@ namespace BitventureAssessment
                         // Initialization of Response Message.  
                         HttpResponseMessage httpResponse = new HttpResponseMessage();
 
+                        
                         foreach (Endpoint endpoint in service.Endpoints)
                         {
+
                             if (endpoint.Enabled)
                             {
                                 // HTTP GET  
@@ -120,12 +123,26 @@ namespace BitventureAssessment
 
                                 if (httpResponse.IsSuccessStatusCode)
                                 {
-                                    //Compare Results
-                                    Response.ComapareResults(service.Identifiers, endpoint ,httpResponse);
+                                    //Bonus Code
+                                    if (service.Datatype.CompareTo(Utilities.DataTypes.JSON.ToString()) == 0)
+                                    {
+                                        //Compare JSON Results
+                                        Response.ComapareJSONResults(service.Identifiers, endpoint, httpResponse, Utilities.DataTypes.JSON.ToString());
+                                    }
+                                    else if (service.Datatype.CompareTo(Utilities.DataTypes.XML.ToString()) == 0)
+                                    {
+
+                                        Response.ComapareXMLResults(service.Identifiers, endpoint, httpResponse, Utilities.DataTypes.XML.ToString());
+
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("{0} : Response DataType is Invalid", service.Datatype);
+                                    }
                                 }
                                 else
                                 {
-                                    Console.WriteLine("{0} : Request Returned {1}", service.BaseUrl+endpoint.Resource,httpResponse.StatusCode.ToString());
+                                    Console.WriteLine("{0} : Request Returned {1}", service.BaseUrl + endpoint.Resource, httpResponse.StatusCode.ToString());
                                 }
 
                             }
@@ -135,6 +152,7 @@ namespace BitventureAssessment
                             }
 
                         }
+                        
                     }
                 }
                 else

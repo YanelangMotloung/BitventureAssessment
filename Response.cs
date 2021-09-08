@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace BitventureAssessment
 {
@@ -22,7 +23,7 @@ namespace BitventureAssessment
         [JsonProperty("identifier", NullValueHandling = NullValueHandling.Ignore)]
         public string Identifier { get; set; }
 
-        public static void ComapareResults(Identifier[] identifiers, Endpoint endpoint, HttpResponseMessage httpResponse)
+        public static void ComapareJSONResults(Identifier[] identifiers, Endpoint endpoint, HttpResponseMessage httpResponse, string dataType)
         {
             try
             {
@@ -33,7 +34,7 @@ namespace BitventureAssessment
                 foreach (Response endpointResult in endpoint.Response)
                 {
                     //Get the associated value of an element from the httpResults
-                    string valueElement = GetElementValue(joResponse, endpointResult.Element);
+                    string valueElement = GetJSONelementValue(joResponse, endpointResult.Element);
 
                     if (!string.IsNullOrEmpty(valueElement))
                     {
@@ -44,7 +45,7 @@ namespace BitventureAssessment
                         }
                         else
                         {
-                            IdentifierMatcher(identifiers,valueElement, endpointResult.Identifier);
+                            IdentifierMatcher(identifiers,valueElement, dataType, endpointResult.Identifier);
                         }
                     }
                     else
@@ -60,15 +61,15 @@ namespace BitventureAssessment
             }
         }
 
-        private static void IdentifierMatcher(Identifier[] identifiers, string element, string identifierChecker)
+        private static void IdentifierMatcher(Identifier[] identifiers, string element,string dataType, string identifierChecker)
         {
             Regex reg = new Regex(identifierChecker);
-
+            bool found = false;
             try
             {
                 if (reg.IsMatch(element))
                 {
-                    Console.WriteLine("{0} from HttpResponce JSON Match Identifier {1} from JSON file", element, identifierChecker);
+                    Console.WriteLine("{0} from HttpResponce {1} Match Identifier {2} from JSON file", element,dataType, identifierChecker);
                 }
                 else
                 {
@@ -80,14 +81,27 @@ namespace BitventureAssessment
                         {
                             if(identifier.Key.CompareTo(identifierChecker) == 0)
                             {
-                                Console.WriteLine("{0} from HttpResponce JSON Match Identifier {1} from JSON file", element, identifier.Value);
+                                found = true;
+                                if (identifier.Value.CompareTo(element) == 0)
+                                {
+                                    Console.WriteLine("{0} from HttpResponce {1} Match Identifier {2} from JSON file", element, dataType, identifier.Value);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("{0} from HttpResponce {1} Located But Mis Match Identifier {2} from JSON file", element, dataType, identifier.Value);
+                                }
+
                             }
+                        }
+
+                        if (!found)
+                        {
+                            Console.WriteLine("{0} from HttpResponce {1}  MisMatch Identifier from JSON file", element, dataType);
                         }
                     }
                     else 
                     {
-                        Console.WriteLine("{0} from HttpResponce JSON  Miss Match Identifier {1} from JSON file", element, identifierChecker);
-
+                        Console.WriteLine("{0} from HttpResponce {1}  Miss Match Identifier {2} from JSON file", element,dataType, identifierChecker);
                     }
 
                 }
@@ -97,7 +111,7 @@ namespace BitventureAssessment
                 s_log.Error(ex.Message);
             }
         }
-
+        
         private static void RegexMatcher(string value, string regexString)
         {
             Regex reg = new Regex(regexString);
@@ -118,7 +132,7 @@ namespace BitventureAssessment
             }
         }
 
-        private static string GetElementValue(JObject joResponse, string element)
+        private static string GetJSONelementValue(JObject joResponse, string element)
         {
             string response = string.Empty;
             try
@@ -166,6 +180,59 @@ namespace BitventureAssessment
             }
 
             return response;
+        }
+
+        public static void ComapareXMLResults(Identifier[] identifiers, Endpoint endpoint, HttpResponseMessage httpResponse, string dataType)
+        {
+            try
+            {
+                XDocument xdoc = XDocument.Parse(httpResponse.Content.ReadAsStringAsync().Result);
+                var xml = XElement.Parse(xdoc.ToString()); // Parse the response
+
+                foreach (Response endpointResult in endpoint.Response)
+                {
+                    //Get the associated value of an element from the httpResults
+                    string valueElement = GetXMLElementValue(xml, endpointResult.Element);
+
+                    if (!string.IsNullOrEmpty(valueElement))
+                    {
+                        // Check if the Identifier is populated
+                        if (string.IsNullOrEmpty(endpointResult.Identifier))
+                        {
+                            RegexMatcher(valueElement, endpointResult.Regex);
+                        }
+                        else
+                        {
+                            IdentifierMatcher(identifiers, valueElement,dataType, endpointResult.Identifier);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("{0} element was not found on HttpResponse", endpointResult.Element);
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                s_log.Error(ex.Message);
+            }
+        }
+
+        private static string GetXMLElementValue(XElement xml, string element)
+        {
+            string result = string.Empty;
+            try
+            {
+                result = xml.Element(element).Value.ToString();
+            }
+            catch (Exception ex)
+            {
+                s_log.Error(ex.Message);
+            }
+
+            return result;
         }
     }
 }

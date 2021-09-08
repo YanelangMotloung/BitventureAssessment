@@ -18,6 +18,9 @@ namespace BitventureAssessment
         [JsonProperty("enabled")]
         public bool Enabled { get; set; }
 
+        [JsonProperty("datatype")]
+        public string Datatype { get; set; }
+
         [JsonProperty("endpoints")]
         public Endpoint[] Endpoints { get; set; }
 

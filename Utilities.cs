@@ -8,5 +8,10 @@ namespace BitventureAssessment
 {
     static class Utilities
     {
+        public enum DataTypes
+        {
+            JSON = 1,
+            XML = 2
+        };
     }
 }
